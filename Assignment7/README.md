@@ -1,3 +1,0 @@
------
-8. Dynamic linking
------
