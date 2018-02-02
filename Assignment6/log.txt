@@ -1,0 +1,121 @@
+Xiwei Ma
+
+1.check the version of sort.
+PATH=/usr/local/cs/bin:$PATH; export PATH
+//update path
+
+sort --version
+sort (GNU coreutils) 8.28
+//should be the right version
+
+2. generate a file containing 10,000,000 random floating point numbers
+using od command and input /dev/urandom
+floating point numbers each has size 4 bytes on x86-64, 
+So 10,000,000 floating point numbers is equal to 
+40,000,000 bytes. So use the od options to get 
+the same exact number of fp numbers and output to a textual file:
+od -f -N 40000000 < /dev/urandom > fpNums.txt
+
+wait for it to generate and open the file to check its format.
+emacs fpNums.txt
+the file looks like:
+0000000   1.6881395e-31  -0.00029314045   1.1356089e+27   1.6966304e-09
+0000020  -4.3236148e-16   2.0545064e-33       -49545.79  -1.0366453e-18
+0000040  -7.3829655e-36   4.8359457e+36    9.138402e-10   7.0089464e+16
+0000060   -3.579844e-22      -3.5683553    6.712889e-14   9.9770306e+29
+0000100   1.7243842e-18  -1.8247055e-26  -7.3071405e+26   -8.832549e-08
+0000120  -1.6174436e-30  -2.5681202e+28    2.401108e-23   1.6547852e+21
+...
+
+It is well formatted so we can use sed and tr to edit the format.
+
+3. create shell script:
+First, remove the leading numbers that are in front of
+the actual floating point numbers each line.
+The numbers are seperate from the fp numbers by spaces,
+so use the sed command:
+
+sed -r 's/^[0-9]*//g'
+to delete all those numbers on each line.
+
+And then, replace all whitespaces with newline character,
+so that each floating point number is on separate line,
+without any spaces:
+
+sed 's/\s/\n/g' 
+#replace all whitespaces with newline
+
+But there are several spaces between each number,
+so there are many empty new lines.
+To delete all empty lines, use the command:
+
+sed '/^$/d'
+
+Put all the lines into one bash program:
+---------------------------------------
+#!/bin/bash
+
+sed -r 's/^[0-9]*//g' |
+#delete the leading unrelated numbers
+
+sed 's/\s/\n/g' |
+#replace all whitespaces with newline
+
+sed '/^$/d'
+#delete all empty line
+--------------------------------------
+and apply the commands on fpNums.txt:
+chmod +x sedEdit
+cat fpNums.txt| ./sedEdit > result.txt
+
+Now result.txt is a qualified file with test data.
+
+4.
+
+time -p sort -g < result.txt > /dev/null :
+
+real 23.03
+user 120.16
+sys 1.29
+
+info sort
+//to see the usage of --parallel=N
+check the path:
+echo $PATH
+
+Now start testing with 1, 2, 4, and 8 threads
+
+--1 thread
+time -p sort --parallel=1  -g < result.txt > /dev/null
+
+real 108.80
+user 108.57
+sys 0.21
+
+--2 threads
+time -p sort --parallel=2 -g < result.txt > /dev/null
+
+real 59.34
+user 111.92
+sys 0.97
+
+--4 threads
+time -p sort --parallel=4 -g < result.txt > /dev/null
+
+real 33.74
+user 113.13
+sys 0.45
+
+--8 threads
+time -p sort --parallel=8 -g < result.txt > /dev/null
+
+real 21.28
+user 114.60
+sys 0.69
+
+As the number of threads increase, the time needed decrease.
+
+
+
+
+
