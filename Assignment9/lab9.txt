@@ -1,0 +1,305 @@
+Xiwei Ma
+LAB 9
+
+1. Get a copy of the Diffutils repository, in Git format
+mkdir gitlab
+cd gitlab
+git clone ~eggert/src/gnu/diffutils
+
+2. Get a log of changes to Diffutils’ master branch
+ls
+Jump to the new directory
+cd diffutils
+git log > git-log.txt
+
+3. Generate a list of tags used for Diffutils
+git tag > git-tags.txt
+
+4. Find the commit
+Open the git-log.txt in emacs:
+emacs git-log.txt
+And then search inside:
+C-s m a i n t : SP q u o t e Enter
+
+From the log, this is
+commit 62ca21c8c1a5aa3488589dcb191a4ef04ae9ed4f
+
+use C-x C-c quit emacs, and generate the patch using its name:
+git show 62ca21c8c1a5aa3488589dcb191a4ef04ae9ed4f > quote-patch.txt
+
+5. Check out version 3.0 of Diffutils from your repository.
+cat git-tags.txt
+v2.7
+v2.8
+v2.8.3
+v2.8.4
+v2.8.6
+v2.8.7
+v2.9
+v3.0
+v3.1
+v3.2
+v3.3
+v3.4
+v3.5
+v3.6
+Found that the version 3.0 should be named v3.0
+So check that version:
+git checkout v3.0
+And showed: Note: checking out 'v3.0'.
+
+6. Then apply the patch:
+patch -p1 < quote-patch.txt
+Errors are:
+HACKING skipped by RETURN
+
+patching file README
+Hunk #1 FAILED at 9.
+Hunk #3 FAILED at 60.
+
+patching file cfg.mk
+Hunk #1 FAILED at 29.
+
+doc/diffutils.texi skipped by RETURN
+
+man/help2man skipped by RETURN
+
+patching file src/diff.c
+Hunk #10 FAILED at 876.
+Hunk #11 FAILED at 906.
+Hunk #12 FAILED at 942.
+
+patching file src/diff3.c
+Hunk #6 FAILED at 433.
+
+7. get an overview of what happened.
+git status
+
+And got:
+HEAD detached at v3.0
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   NEWS
+	modified:   README
+	modified:   TODO
+	modified:   doc/diagmeet.note
+	modified:   ms/config.bat
+	modified:   ms/config.site
+	modified:   po/en.po
+	modified:   src/analyze.c
+	modified:   src/cmp.c
+	modified:   src/context.c
+	modified:   src/diff.c
+	modified:   src/diff.h
+	modified:   src/diff3.c
+	modified:   src/dir.c
+	modified:   src/ifdef.c
+	modified:   src/io.c
+	modified:   src/sdiff.c
+	modified:   src/side.c
+	modified:   src/system.h
+	modified:   src/util.c
+	modified:   tests/help-version
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+	NEWS.orig
+	README-hacking.orig
+	README-hacking.rej
+	README.orig
+	README.rej
+	cfg.mk.orig
+	cfg.mk.rej
+	git-log.txt
+	git-tags.txt
+	ms/config.site.orig
+	quote-patch.txt
+	src/cmp.c.orig
+	src/context.c.orig
+	src/diff.c.orig
+	src/diff.c.rej
+	src/diff.h.orig
+	src/diff3.c.orig
+	src/diff3.c.rej
+	src/dir.c.orig
+	src/sdiff.c.orig
+	src/system.h.orig
+	src/util.c.orig
+	tests/help-version.orig
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+8. Learn how to use the Emacs functions vc-diff (C-x v =) and vc-revert (C-x v u)
+Following the link, we can see that vc-diff is
+"Compare the work files in the current VC fileset with the versions you started from"
+And vc-revert is
+"Revert the work file(s) in the current VC fileset to the last revision"
+In *vc-diff* buffer, use the diff-apply-hunk (C-c C-a)
+Notice that "With a prefix argument of C-u, revert this hunk"
+
+9.
+First, revert all the changes to files other than .c files:
+NEWS
+README
+TODO
+doc/diagmeet.note
+ms/config.bat
+ms/config.site
+po/en.po
+src/diff.h
+src/system.h
+tests/help-version
+
+1)use emacs to open them
+2)vc-diff (C-x v =) to see the changes
+3) revert all: C-x v u y e s Enter
+
+Second, for all the .c files:
+src/analyze.c
+src/cmp.c
+src/context.c
+src/diff.c
+src/diff3.c
+src/dir.c
+src/ifdef.c
+src/io.c
+src/sdiff.c
+src/side.c
+src/util.c
+1)open with emacs
+2)vc-diff (C-x v =) to see the changes
+3)in buffer *vc-diff*, find changes to character string constants
+4)other than these, undo all the changes using C-u C-c C-a
+
+10. examine the files src/*.c.rej
+open use emacs:
+emacs src/*.c.rej
+Related .c files need patch are src/diff.c and src/diff3.c
+So manully apply the patch to these files:
+
+First in src/diff.c :
+emacs src/diff.c
+I found that the line numbers, orders, upper/lower case aren't match:
+Use C-s to search,
+the first one should be added at L898
+and the second one should be applied at L873
+the third one should be applied at L877
+
+Then in src/diff3.c:
+emacs src/diff3.c
+The line should be at L438
+
+11. Remove all untracked files
+simple use the command:
+git clean -f
+to remove all untracked files:
+Removing NEWS.orig
+Removing README-hacking.orig
+Removing README-hacking.rej
+Removing README.orig
+Removing README.rej
+Removing cfg.mk.orig
+Removing cfg.mk.rej
+Removing git-log.txt
+Removing git-tags.txt
+Removing ms/config.site.orig
+Removing quote-patch.txt
+Removing src/#diff.c.rej#
+Removing src/cmp.c.orig
+Removing src/context.c.orig
+Removing src/diff.c.orig
+Removing src/diff.c.rej
+Removing src/diff.h.orig
+Removing src/diff3.c.orig
+Removing src/diff3.c.rej
+Removing src/dir.c.orig
+Removing src/sdiff.c.orig
+Removing src/system.h.orig
+Removing src/util.c.orig
+Removing tests/help-version.orig
+
+12. check status and diff
+
+git status
+
+and get:
+HEAD detached at v3.0
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   src/cmp.c
+	modified:   src/diff.c
+	modified:   src/diff3.c
+	modified:   src/dir.c
+	modified:   src/sdiff.c
+	modified:   src/util.c
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+Indeed, there are half-dozen modified files.
+
+Then use diff:
+
+git diff > quote-3.0-patch.txt
+
+Open the quote-3.0-patch.txt, there are 315 lines, around expected.
+
+13. Build the resulting modified version of Diffutils
+emacs README-hacking
+to see the required commands
+skipping the part about CVS;
+
+./bootstrap
+
+since I'm in lnvsrv09, logout and login in lnxsrv04
+to avoid the problem with gets
+
+./configure
+make
+make check
+
+Then check use
+
+diff . -
+
+and got:
+diff: cannot compare '-' to a directory
+which is correct '
+
+diff --help
+
+the quote marks are correct.
+
+14. Do a sanity test using the modified version of Diffutils that you just built
+First, put the latter source code into a directory diffutils-3.0-patch:
+
+mkdir diffutils-3.0-patch
+cp src/*.c diffutils-3.0-patch
+
+Then, get the former version:
+
+mkdir diffutils-3.0
+git clone ~eggert/src/gnu/diffutils diffutils-former
+cd diffutils-former/
+git checkout v3.0
+cp src/*.c ../diffutils/diffutils-3.0
+
+To check and run your implementation of diff,
+jump back to diffutils
+and use :
+
+src/diff -pru diffutils-3.0 diffutils-3.0-patch >quote-3.0-test.txt
+
+15. compare the contents of quote-3.0-test.txt and quote-3.0-patch.txt
+use the command:
+
+diff quote-3.0-test.txt quote-3.0-patch.txt
+
+The difference are related to quotation marks ` and '
+or path differences.
+
+Thus, the differences are innocuous

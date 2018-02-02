@@ -1,0 +1,23 @@
+Xiwei Ma
+LAB 9
+
+briefly describe the roles of subwindows that you see in the screenshot.
+
+1.On the top left window, there are history commits arranged in
+the shape of a tree. Also shows the branches of each commits and the commit messages,
+as well as display graphically their relationships.
+
+2.The top middle window shows a list of usernames and email addresses associated with
+each commit. They are authors of cooresponding commits.
+
+3. The top right show the exact date and time commits were made. Cooresponding to the commit in the same row.
+
+4. In the bottom, the left window shows the Log information of the selected commits.
+Includes its author, committer, time, parent, child, branches, follows, precedes, and the
+log message.
+
+5. The right part list the related file effect by the selected commit, in this case it is empty
+with space for comments.
+
+6. Between the top and below there are also lines for search and SHAI ID.
+
