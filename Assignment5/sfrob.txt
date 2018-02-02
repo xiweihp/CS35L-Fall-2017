@@ -1,0 +1,119 @@
+Xiwei Ma
+LAB 5: sfrob.txt
+
+Differences in performance between sfrob and sfrobu using the time command:
+
+1. create a huge file with 100000 lines.
+I wrote a c program:
+#include <stdio.h>
+int main()
+{
+  int i;
+  for (i =0 ; i <=100000; i++)
+    {
+      printf("*~BO *{_CIA *hXE]D *LER #@_GZY #E\\OX #^BO #FKPS #NEM\4\n");
+    }
+}
+And put the output into a file: bigFile.txt
+
+2. Test with different number of lines
+Use the commands:
+time ./sfrob < <(head -10 bigFile.txt)
+time ./sfrob < <(head -100 bigFile.txt)
+time ./sfrob < <(head -1000 bigFile.txt)
+time ./sfrob < <(head -10000 bigFile.txt)
+time ./sfrob < <(head -100000 bigFile.txt)
+
+time ./sfrobu < <(head -10 bigFile.txt)
+time ./sfrobu < <(head -100 bigFile.txt)
+time ./sfrobu < <(head -1000 bigFile.txt)
+time ./sfrobu < <(head -10000 bigFile.txt)
+time ./sfrobu < <(head -100000 bigFile.txt)
+
+3. Compare the output:
+10 lines:
+sfrob                     sfrobu
+real 0m0.003s	          real	0m0.003s
+user 0m0.000s		  user	0m0.002s
+sys  0m0.000s		  sys  0m0.001s
+
+100 lines:
+
+real 0m0.003s             real	0m0.028s
+user 0m0.001s		  user	0m0.002s
+sys  0m0.001s		  sys	0m0.025s
+
+1000 lines:
+real 0m0.047s             real	0m0.367s
+user 0m0.012s		  user	0m0.010s
+sys  0m0.027s		  sys	0m0.355s
+
+10000 lines:
+real  0m0.143s            real	0m0.980s
+user  0m0.118s		  user	0m0.117s
+sys   0m0.019s		  sys	0m0.811s
+
+100000 lines:
+real   0m3.987s           real	0m4.679s
+user   0m0.899s		  user	0m0.951s
+sys    0m0.164s		  sys	0m2.854s
+
+4. 
+--sfrobu, the unbuffered one, always takes longer time.
+--the time needed for sfrobu grow faster compare with sfrob.
+
+5.
+In the program sfrobu, add a global vaiable to count:COUNT_CMP 
+And use COUNT_CMP++ every time enters the fcmp function
+./sfrobu < <(head -10 bigFile.txt): 400
+./sfrobu < <(head -100 bigFile.txt): 6451
+./sfrobu < <(head -1000 bigFile.txt): 88808
+./sfrobu < <(head -10000 bigFile.txt): 1140594
+./sfrobu < <(head -100000 bigFile.txt): 13922941
+By linear regression, compute:
+f = 114.92x-10120;
+
+
+Use the time command to compare the overall performance
+
+The commands are:
+time ./sfrob < <(head -100000 bigFile.txt)
+time ./sfrobu < <(head -100000 bigFile.txt)
+time ./sfrobs < <(head -100000 bigFile.txt)
+time ./sfrobu -f < <(head -100000 bigFile.txt)
+time ./sfrobs -f < <(head -100000 bigFile.txt)
+
+1. For ./sfrob
+real   0m2.559s
+user   0m0.891s
+sys    0m0.159s
+
+2. For ./sfrobu
+real   0m4.956s
+user   0m0.992s
+sys    0m2.712s
+
+3. For ./sfrobs
+real   0m1.547s
+user   0m0.359s
+sys    0m0.303s
+
+4. For ./sfrobu -f
+real   0m7.809s
+user   0m1.408s
+sys    0m2.724s
+
+5. For ./sfrobs -f
+real   0m1.722s
+user   0m0.703s
+sys    0m0.285s
+
+From the above output,
+without -f flag,
+--the performace of buffered version is better than 
+unbuffered version.
+--The shell script is the fastest.
+(./sfrobs faster than ./sfrob faster than ./sfrobu)
+
+When the -f flag is added,
+--the time needed is increased as expected; more syscalls.

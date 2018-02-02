@@ -1,0 +1,142 @@
+Xiwei Ma
+Laboratory: Buffered versus unbuffered I/O
+
+1. Write a tr2b.c program using getchar and putchar
+emacs tr2b.c
+//create a C language file.
+Write the program in that file.
+
+2. Write tr2u.c
+emacs tr2u.c
+And wirte program in that file.
+
+3. Compile the .c files
+gcc -o tr2b tr2b.c
+gcc -o tr2u tr2u.c
+
+4.Generate a large file at least 5,000,000 bytes
+head --bytes=5000000 /dev/urandom > test.txt
+check the size of the file:
+ls -l
+-rw-r--r-- 1 classxiw class 5000000 Nov  4 14:41 test.txt
+The file is qualified.
+
+5.Use the strace command to compare the system calls
+man strace
+//check the man page to see its usage
+(a)when copying one file to another
+use the comands:
+strace -c ./tr2b 'a' 'b' < test.txt > testb.txt
+strace -c ./tr2u 'a' 'b' < test.txt > testu.txt
+
+test ./tr2b:
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 24.00    0.000018           5         4           mprotect
+ 16.00    0.000012          12         1           write
+ 14.67    0.000011           6         2           read
+ 14.67    0.000011          11         1           munmap
+ 13.33    0.000010           3         4           fstat
+ 12.00    0.000009           1         9           mmap
+  5.33    0.000004           4         1           arch_prctl
+  0.00    0.000000           0         2           open
+  0.00    0.000000           0         2           close
+  0.00    0.000000           0         1           brk
+  0.00    0.000000           0         1         1 access
+  0.00    0.000000           0         1           execve
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.000075                    29         1 total
+
+test ./tr2u:
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 55.92   28.938881           6   5000000           write
+ 44.08   22.809754           5   5000002           read
+  0.00    0.000051           7         7           mmap
+  0.00    0.000034           9         4           mprotect
+  0.00    0.000017           9         2           open
+  0.00    0.000013          13         1           munmap
+  0.00    0.000008           4         2           close
+  0.00    0.000008           4         2           fstat
+  0.00    0.000008           8         1         1 access
+  0.00    0.000007           7         1           execve
+  0.00    0.000005           5         1           brk
+  0.00    0.000005           5         1           arch_prctl
+------ ----------- ----------- --------- --------- ----------------
+100.00   51.748791              10000024         1 total
+
+The number of system calls used by the unbuffered tr2u is obviously
+lots of greater than that being used by buffered tr2b version. The performance
+is significatnly effected by the using read and write for every single byte.
+
+
+(b)when copying a file to your terminal
+use the commands:
+strace -c ./tr2b 'a' 'b' < test.txt
+strace -c ./tr2u 'a' 'b' < test.txt
+test ./tr2b:
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 42.62    0.000104           9        11           write
+ 18.03    0.000044           5         9           mmap
+ 12.70    0.000031           8         4           mprotect
+  6.97    0.000017           9         2           read
+  6.56    0.000016           8         2           open
+  6.15    0.000015           4         4           fstat
+  4.10    0.000010          10         1           munmap
+  1.64    0.000004           4         1           arch_prctl
+  1.23    0.000003           2         2           close
+  0.00    0.000000           0         1           brk
+  0.00    0.000000           0         1         1 access
+  0.00    0.000000           0         1           execve
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.000244                    39         1 total
+
+test ./tr2u:
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 56.71   32.864914           7   5000000           write
+ 43.29   25.086371           5   5000002           read
+  0.00    0.000050           7         7           mmap
+  0.00    0.000031           8         4           mprotect
+  0.00    0.000017           9         2           open
+  0.00    0.000013          13         1           munmap
+  0.00    0.000009           9         1         1 access
+  0.00    0.000008           4         2           close
+  0.00    0.000008           4         2           fstat
+  0.00    0.000008           8         1           execve
+  0.00    0.000005           5         1           brk
+  0.00    0.000005           5         1           arch_prctl
+------ ----------- ----------- --------- --------- ----------------
+100.00   57.951439              10000024         1 total
+
+From the output it shows that the syscall number for tr2b is significantly 
+fewer than tr2u version. In the unbuffered one, it use syscall for read and 
+write each character. And the two additional read calls are for file information.
+
+When working on large files like this one, their difference on numbers of syscalls
+needed are significant. 
+
+
+6. Use the time command
+time ./tr2b 'a' 'b' < test.txt > test1.txt
+time ./tr2u 'a' 'b' < test.txt > test2.txt
+
+time for tr2b:
+
+real 0m0.003s
+user 0m0.001s
+sys  0m0.001s
+
+time for tr2u:
+
+real 0m7.025s
+user 0m0.282s
+sys  0m6.698s
+
+Same as expected, the time needed to run on a same file
+shows their difference on performance.
+Obviously, the buffered one has greater performance,
+saved lots of time when working on large files.
+
+
