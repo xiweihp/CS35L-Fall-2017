@@ -1,0 +1,229 @@
+Xiwei Ma
+
+1.
+man -k SpecificString
+
+how to discover: read through man page of man to find the answer.
+ -k can be used to find keyword in description and
+ -K (--global-apropos) can search in all manual page.
+
+keystroke: man man
+
+2.
+/usr/bin/cp
+/usr/bin/wc
+
+how to discover: use man page to find the command which; 
+then use command: which keyword
+
+keystroke: man which Enter which cp Enter which wc Enter
+
+
+3.
+[ : Bash.
+w : Show who is logged on and what they are doing.
+(X : No man entry (not actually a command))
+
+how to discover: use command line: find /usr/bin/ -name '?' and 
+then use man page to find out what they do.
+
+keystroke: 
+find /usr/bin/ -name '?'
+man [
+man w
+man X
+
+4.
+/etc/alternatives/emacs
+
+how to discover: first jump to /usr/bin/ directory.
+ Then search through the directory to make sure there is such file.
+Use ls -l to see detailed information and
+find emacs file is followed by "-> /etc/alternatives/emacs"
+
+keystroke: 
+cd /usr/bin
+ls -l
+
+5.
+g+s: the set-group-ID-on-execution is set
+o-x: The execute/search bits of other parts are cleared.
+
+how to discover: use man page of chmod to find the symbolic mode.
+ g or o are who symbols, specify the group, other parts.
+ s and x are perm symbols; + and - are op symbols.
+
+keystroke: 
+man chmod
+/symbolic
+
+6. 
+-mtime 
+(or -atime if units are specified)
+
+how to discover: open man page of find,
+then search for keyword "modification" and 
+go through to locate the right option.
+
+keystroke: 
+man find
+/modification
+
+7.
+.
+./nsdefault
+./Desktop
+./Documents
+./Downloads
+./.ssh
+./.cache
+./.cache/abrt
+./.config
+./.config/abrt
+./perl5
+./.emacs.d
+./.emacs.d/auto-save-list
+
+how to discover: use the command found in the last question and
+find the feature -type d to specify the result. (Only work on SeaSnet)
+
+keystroke: 
+find -mtime -21 -type d
+
+8.
+246
+
+how to discover: use which find command to find the location of find directory.
+Then use find /usr/bin -type l to list all symbolic files.
+Count all directories returned in a file.
+
+keystroke: 
+man find
+/symbolic link
+which find
+find /usr/bin -type l
+
+9.
+libgpg-error.so.0.10.0
+
+how to discover: Jump to directory /usr/lib. 
+Then list all files with flags -t and -l to check the oldest regular file.
+
+keystroke: 
+cd /usr/lib
+ls -t -l
+
+10.
+LANG and LC_* variable
+
+keystroke: 
+man locale
+
+11.
+Buffer-menu-sort              M-x ... RET
+  Command: Sort the buffer menu by COLUMN.
+Buffer-menu-sort-by-column    M-x ... RET
+  Command: Sort the buffer menu by the column clicked on.
+ibuffer-invert-sorting        M-x ... RET
+  Command: Toggle whether or not sorting is in reverse order.
+ibuffer-toggle-sorting-mode   M-x ... RET
+  Command: Toggle the current sorting mode.
+  rmail-sort-by-author          M-x ... RET
+  Command: Sort messages of current Rmail file by author.
+rmail-sort-by-correspondent   M-x ... RET
+  Command: Sort messages of current Rmail file by other correspondent.
+rmail-sort-by-date            M-x ... RET
+  Command: Sort messages of current Rmail file by date.
+rmail-sort-by-labels          M-x ... RET
+  Command: Sort messages of current Rmail file by labels.
+rmail-sort-by-lines           M-x ... RET
+Command: Sort messages of current Rmail file by number of lines.
+rmail-sort-by-recipient       M-x ... RET
+  Command: Sort messages of current Rmail file by recipient.
+rmail-sort-by-subject         M-x ... RET
+  Command: Sort messages of current Rmail file by subject.
+sort-columns                  M-x ... RET
+  Command: Sort lines in region alphabetically by a certain range of columns.
+sort-fields                   M-x ... RET
+  Command: Sort lines in region lexicographically by the ARGth field of each li\
+sort-lines                    M-x ... RET
+  Command: Sort lines in region alphabetically; argument means descending order\
+.
+sort-numeric-fields           M-x ... RET
+  Command: Sort lines in region numerically by the ARGth field of each line.
+sort-pages                    M-x ... RET
+  Command: Sort pages in region alphabetically; argument means descending order\
+.
+sort-paragraphs               M-x ... RET
+  Command: Sort paragraphs in region alphabetically; argument means descending \
+order.
+sort-regexp-fields            M-x ... RET
+  Command: Sort the region lexicographically as specified by RECORD-REGEXP and \
+KEY.
+
+how to discover: use Apropos command to search commands with sort. 
+
+keystroke: emacs C-h a sort Enter C-x C-o C-v C-v C-v C-v
+
+12.
+C-M-a           beginning-of-defun
+C-M-b           backward-sexp
+C-M-c           exit-recursive-edit
+C-M-d           down-list
+C-M-e           end-of-defun
+C-M-f           forward-sexp
+C-M-h           mark-defun
+
+how to discover: use help b command to check all key translation.
+Then search for C-M-a.
+
+keystroke: C-h b C-x o C-s C-M-a
+
+13.
+keyboard-quit is an interactive compiled Lisp function in `simple.el'.
+Signal a `quit' condition.
+During execution of Lisp code, this character causes a quit directly.
+At top-level, as an editor command, this simply beeps.
+
+how to discover: search the command in keystroke translation.
+
+keystroke: C-h b C-x o C-s C-g M-f Enter
+
+14.
+yank is an interactive compiled Lisp function in `simple.el'.
+It is bound to C-y, <S-insertchar>, <S-insert>, <menu-bar> <edit> <paste>.
+(yank &optional ARG)
+
+Reinsert ("paste") the last stretch of killed text.
+More precisely, reinsert the stretch of killed text most recently
+killed OR yanked.  Put point at end, and set mark at beginning.
+With just C-u as argument, same but put point at beginning (and mark at end).
+With argument N, reinsert the Nth most recently killed stretch of killed
+text.
+
+When this command inserts killed text into the buffer, it honors
+`yank-excluded-properties' and `yank-handler' as described in the
+doc string for `insert-for-yank-1', which see.
+
+See also the command `yank-pop' (M-y).
+
+how to discover: use C-h a to find the command that uses for search function.
+Then use C-h f and type in the function name to get the definition of yank.
+
+keystroke: C-h f yank Enter
+
+15.
+emacs:   /usr/bin:
+  total used in directory 106792 available 24440204
+  drwxr-xr-x  1067 root   wheel      36278 Sep 28 02:07 .
+  drwxr-xr-x@    9 root   wheel        306 Jan 11  2017 ..
+ls -l:
+  total 106792
+
+difference: 
+Emacs Dired command prints out the available number and two more marked . and ..
+
+how to discover: use Dired command in Emacs to print out the list of files and 
+compare with the result of ls -l.
+
+keystroke: C-h a dired Enter C-x d /usr/bin Enter
