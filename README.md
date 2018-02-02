@@ -3,7 +3,7 @@ UCLA CS35L - prof. Eggert
 https://web.cs.ucla.edu/classes/fall17/cs35L/assign.html
 
 --------
-only assignments with score 90+ is uploaded:
+only assignments with score 90+ are uploaded:
 -----
 Assignment1  99/100
 -----
