@@ -1,0 +1,28 @@
+#!/bin/bash
+
+grep "<td>.\{1,\}<\/td>" |
+#only keep lines with words in table
+
+sed -n 'g;n;p'|
+#remove every odd line
+
+tr '[:upper:]' '[:lower:]'|
+#upper to lower
+sed "s/\`/\'/g"|
+#replace with apostroph
+
+sed 's/<td>//g;s/<\/td>//g;s/<u>//g;s/<\/u>//g'|
+#delete the pattern <u> and </u> in line
+#remove <td> and </td>
+
+sed "s/^\s*//g"|
+#remove leading whitespaces
+
+sed 's/[, ]/\n/g'|
+#replace commas and spaces with new lines.
+
+grep "^[pk\' mnwlhaeiou]\{1,\}$" | 
+#remove the lines with character other than these.
+
+sort -u
+#sort without duplicates

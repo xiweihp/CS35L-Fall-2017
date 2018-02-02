@@ -1,0 +1,114 @@
+#!/bin/bash
+D=$1
+#$1: the first parameter; in this case, the directory D
+
+#save IFS default values to restore it after the program.
+#set IFS to only newline 
+#so that space and tab would not split the name of file.
+
+#save all regular files into an array
+
+#prefer files whose name start with "." to other files
+#so add files with "." first
+FILES=`ls -a $D | grep "^\."|sort`
+declare -a ARRAY
+let count=0
+
+original="$IFS"
+IFS=$'\n'
+
+for FILE in $FILES
+do
+    if [ ! -L "$D/$FILE" ]
+    # silently ignore all symbolic links
+    then
+	if [ -f "$D/$FILE" ]
+	# ignore all directories(only regular files)
+	then
+	    if [ ! -r "$D/$FILE" ]
+	    #not readable
+	    then
+		echo "$FILE is not readable"
+	    else
+		ARRAY[$count]="$D/$FILE"
+		count=$(($count+1))
+		#add the file to array
+	    fi
+	fi
+    fi
+done
+
+#add other sorted regular files that not beginning with .
+AFILES=`ls $D | sort`
+for aFILE in $AFILES
+do
+    if [ ! -L "$D/$aFILE" ]
+    # silently ignore all symbolic links
+    then
+        if [ -f "$D/$aFILE" ]
+        # ignore all directories(only regular files)
+	then
+            if [ ! -r "$D/$aFILE" ]
+            #not readable
+	    then
+                echo "$aFILE is not readable"
+            
+            else
+		ARRAY[$count]="$D/$aFILE"
+		count=$(($count+1))
+		#add the file to array
+	    fi
+        fi
+    fi
+done
+
+#use for loop to compare each element in array
+
+#first=0
+#while [ $first<$count ]
+#do
+#    secondAndAbove=$(($first+1))
+#    while [ $secondAndAbove<$count ]
+#    do
+#	firstFile="${ARRAY[$first]}"
+#
+#	secondFile="${ARRAY[$secondAndAbove]}"
+#
+#	cmp -s $firstFile $secondFile
+#	#compare files byte by byte
+#	if [ $? -eq 0 ]
+ #       #if the return value means they are the same
+#	then
+#	    echo "$firstFile"
+#	    echo "$secondFile"
+#	    if [ "$firstFile" != "$secondFile" ]
+#	    then
+#	    #may duplicate the file name when adding two times into array
+#	    ln -fP $firstFile $secondFile
+#	    ARRAY[$secondAndAbove]=ARRAY{$first]
+#	   # ln $firstFile $secondFile
+          #ln makes hard links by default.
+#	    fi
+#	fi
+ #      secondAndAbove=$(($secondAndAbove+1))
+  #  done
+   # first=$(($first+1))
+#done
+
+for (( first=0; first<$count; first++ ))
+do
+    for (( second=first+1; second<$count; second++ ))
+    do
+	cmp -s "${ARRAY[$first]}" "${ARRAY[$second]}"
+	if [ $? -eq 0 ]
+	then
+	    ln -fP "${ARRAY[$first]}" "${ARRAY[$second]}"
+	    ARRAY[$second]=ARRAY[$first]
+        fi
+    done
+done
+
+IFS=$original
+#restore the default value of IFS.
+
+

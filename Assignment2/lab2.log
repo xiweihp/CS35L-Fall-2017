@@ -1,0 +1,316 @@
+After logged in seasnet,
+create a new directory named "lab2" for this assignment.
+In that current directory, type the command:
+sort /usr/share/dict/words > words
+to create such a file.
+
+Then, use the command:
+curl http://web.cs.ucla.edu/classes/fall17/c
+s35L/assign/assign2.html > lab02.html
+to get the HTML of this assignment web page into a text file.
+
+1. Run the command:
+cat lab02.html | tr -c 'A-Za-z' '[\n*]'
+Compared it with cat lab02.html, 
+all characters not from a-z or A-Z are changed to new lines. 
+
+2. command:
+cat lab02.html | tr -cs 'A-Za-z' '[\n*]'
+Compared with the previous one, 
+the output displays no empty new lines; Only characters from a-z Or A-Z. 
+
+3.command:
+cat lab02.html | tr -cs 'A-Za-z' '[\n*]' | sort
+Different from previous command, the output is sorted in alphabetical order.
+One word per line.
+
+4.command:
+cat lab02.html | tr -cs 'A-Za-z' '[\n*]' | sort -u
+Still in alphabetical order, but there are no repeating words anymore. 
+Only unique words.
+
+5.command:
+cat lab02.html | tr -cs 'A-Za-z' '[\n*]' | sort -u | comm - words
+There are three columns, 
+one is the lines only in file1, which is the sorted lab02.html; 
+the other is lines only in file2, which is the words file we construct first; 
+another one prints lines in both files.
+
+6.command:
+cat lab02.html | tr -cs 'A-Za-z' '[\n*]' | sort -u | comm -23 - words
+This command suppress the printing of column 2 and 3, 
+only outputs the first column of the previous one, 
+which includes the words that unique to the lab02.html.
+
+Create a copy of all the Hawaiian words in the tables by Wget:
+wget http://mauimapp.com/moolelo/hwnwdseng.htm
+
+use emacs to create a bash file buildwords
+
+use emacs open the webpage hwnwdseng.htm, 
+found that the words are all between <td> and </td>. 
+So the first step should select out all lines with <td> </td>. 
+1.
+So write the corresponding code  in buildwords:
+grep "<td>.\{1,\}<\/td>" 
+#only keep lines with words in table
+use regular expressions with grep to 
+help select the words in between <td> and </td>
+
+When try to check the first step using command ./buildwords, 
+shell returns permission denied.
+Forget to change the mode of the file: chmod +x buildwords
+Try again using ./buildwords < hwnwdseng.htm > hwords to check the first step.
+
+check hwords file, now the remaining lines are only 
+English words, Hawaiian words one per line
+
+2.
+We can then remove odd lines, which should be lines with English words. 
+To use the output of last command, add a pipeline | at the end of it.
+The new steps to be added is:
+sed -n 'g;n;p'
+#remove every odd line
+
+Test the code to make sure the bash code runs very well so far.
+
+3.
+Treat upper case letters as if they were lower case; 
+treat ` as if it were apostroph:
+tr '[:upper:]' '[:lower:]' | 
+#upper to lower
+sed "s/\`/\'/g" 
+#replace with apostroph
+
+(BUG: The use of ' conflict at first; add double quote and backslash)
+
+check hwords file and everything went as expected.
+
+4.
+According to the requirment, 
+treat "<u>a</u>" as if it were "a" or other letters;
+And also need to remove the <td></td>:
+sed 's/<td>//g;s/<\/td>//g;s/<u>//g;s/<\/u>//g'
+#delete the pattern <u> and </u> in line 
+#remove <td> and </td> 
+
+5.
+remove leading spaces
+sed 's/^\s*//g'
+#remove leading whitespaces
+use^to indicate the beginning, * indicate the repeating.
+
+6.
+treat parts seperate by , or spaces as multiple words.
+Simply transfer commas and spaces to new lines.
+sed 's/[, ]/\n/g'
+#replace commas and spaces with new lines.
+
+Check the hwords file and find that
+empty lines occur when comma and space appear together.
+
+7. 
+reject any entries that contain non-Hawaiian letters.
+grep "^[pk\' mnwlhaeiou]\{1,\}$"
+#remove the lines with characters other than these.
+
+(BUG: typed '' instead of "" at the beginning. Report as syntax error.)
+
+8.
+Last thing to do: Sort the resulting list of words, removing any duplicates.
+sort -u
+#sort without duplicates
+
+Finally meet all the requirements! 
+Pipelines are added at the end of each line except the last one
+the bash file looks like this:
+
+#!/bin/bash                                                                    
+
+grep "<td>.\{1,\}<\/td>" |
+#only keep lines with words in table
+
+sed -n 'g;n;p'|
+#remove every odd line
+
+tr '[:upper:]' '[:lower:]'|
+#upper to lower
+
+sed "s/\`/\'/g"|
+#replace with apostroph
+
+sed 's/<td>//g;s/<\/td>//g;s/<u>//g;s/<\/u>//g'|
+#delete the pattern <u> and </u> in line
+#remove <td> and </td>
+
+sed "s/^\s*//g"|
+#remove leading whitespaces
+
+sed 's/[, ]/\n/g'|
+#replace commas and spaces with new lines. 
+
+grep "^[pk\' mnwlhaeiou]\{1,\}$" |
+#remove the lines with character other than these.
+
+sort -u
+#sort without duplicates   
+------------------------end of program-------------------
+
+Since already chmod +x during the test before, 
+the file is already executable.
+
+Make hwords a Hawaiian dictionary:
+modified the command as:
+cat hwnwdseng.htm | ./buildwords > hwords
+
+1.Count the number of "misspelled" English:
+cat lab02.html | tr -cs 'A-Za-z' '[\n*]' |
+sort -u | comm -23 - words | wc -l
+Use the commands we learned above to get the content of web;
+remove the characters other than a-z A-Z and newline;
+sort and remove duplicates. Then use the output and wc -l to count the words.
+(words dictionary has both Upper and lower cases.)
+
+ANSWER: 81.
+
+2.Count the number of "misspelled" Hawaiian words:
+cat lab02.html |tr 'PKMNWLHAEIOU' 'pkmnwlhaeiou'| tr -cs 'A-Za-z' '[\n*]' 
+| tr '[:upper:]' '[:lower:]'| sort -u | comm -23 - hwords | wc -l
+Only two changes:
+Change it to Hawaiian words;
+change the dictionary from word to hword.
+
+ANSWER: 198
+
+3.Are there any words that are "misspelled" as English, but not as Hawaiian?
+cat lab02.html | tr -cs 'A-Za-z' '[\n*]' | sort -u | comm -23 - words
+| tr '[:upper:]' '[:lower:]'| comm -12 - hwords
+First find those are misspelled in English,
+then change all upper case characters to lower,
+use -12 to print the 3rd column, 
+which are words common from both input and output.
+
+ANSWER:
+halau
+lau
+wiki
+
+4."misspelled" as Hawaiian but not as English? 
+cat lab02.html |tr '[:upper:]' '[:lower:]'
+|tr -cs "pk\'mnwlhaeiou" '[\n*]'  |sort -u 
+| comm -23 - hwords|tr -cs 'A-Za-z' '[\n*]' |comm -12 - words
+
+Before checking with words, make sure its all a-zA-Z or newline. 
+Change the order of words and hwords.
+
+ANSWER:there are lots of such words(109). 
+examples:
+a
+ail
+ain
+ake
+al
+ale
+alen
+all
+amine
+amp
+ample
+an
+aph
+awk
+e
+ea
+ee
+el
+em
+emp
+en
+ep
+epa
+h
+ha
+han
+hap
+hawaiian
+he
+hei
+hell
+hem
+hen
+hi
+hin
+ho
+how
+howe
+ia
+ie
+ii
+ile
+imp
+in
+ion
+iou
+k
+keep
+kin
+l
+lan
+le
+lea
+li
+like
+line
+link
+ln
+lo
+lowe
+m
+mail
+man
+me
+men
+mi
+ml
+mo
+mp
+n
+name
+ne
+nee
+no
+non
+nu
+num
+o
+om
+on
+one
+op
+ope
+open
+own
+p
+paul
+pe
+pell
+people
+plea
+pu
+u
+ui
+ula
+ule
+ume
+ump
+un
+uni
+w
+wa
+wan
+we
+wh
+wha
+who
+wi
+wo
