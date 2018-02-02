@@ -1,0 +1,172 @@
+Xiwei Ma
+lab3
+
+1. Grab Coreutils 7.6.
+Downloaded the Coreutils-7.6.tar following the link on the assignment page.
+And then untar the file using the command:
+tar -xzvf coreutils-7.6.tar.gz
+
+2.
+jump into that directory: 
+cd coreutils-7.6
+use command ls to see the files inside the download coreutils folder.
+use 'cat INSTALL'command to read the instructions.
+According to INSTALL, 
+"the shell commands `./configure; make; 
+make install' should configure, build, and install this package. "
+So use the commands and wait for each one to finish:
+./configure
+make
+make install
+
+Errors appeared; Read INSTALL again
+Forgot adding -prefix when run ./configure
+mkdir coreutils ; cd coreutils
+//make a new directory and jump to that directory
+pwd // get the path to that directory
+Went back to try again with -prefix
+./configure --prefix=/u/eng/class/classxiw/Desktop/coreutils
+make
+make install
+No error message returned this time.
+
+3.
+
+cd /u/eng/class/classxiw/Desktop/coreutils
+//jump to that new directory
+ls //make sure bin exist
+cd bin/
+export LC_ALL='en_US.UTF-8'
+ls -l /bin/bash
+-rwxr-xr-x 1 root root 960632 Aug  3 06:36 /bin/bash
+
+Error: not the YYYY-MM-DD format as expected.
+Asked about the question on Piazza and I found that
+the command I typed is wrong.
+
+It should be:
+./ls -l /bin/bash
+and the output:
+-rwxr-xr-x 1 root root 960632 2017-08-03 06:36 /bin/bash
+
+So the bug is reproduced.
+
+4. Use Emacs or Vim to apply Brady's patch
+To apply a change to the ls command, first find the file
+inside directory src in coreutils-7.6.
+cd /u/eng/class/classxiw/coreutils-7.6/src
+The ls.c file is in this directory.
+
+The Brady's patch is actually a diff file.
+open vim and create a new file patch_Brady,
+copy paste from Brady's.
+Since the file is already in the same directory as ls.c,
+edit the path of files in path_Brady:
+a/src/ls.c change to ls.c;
+b/src/ls.c change to ls.c.
+
+Then use the command: 
+patch -p0 < patch_Brady
+output succeeded: 
+patching file ls.c
+Hunk #1 succeeded at 2013 (offset -1 lines).
+Hunk #2 succeeded at 2028 (offset -1 lines).
+
+5.build (but do not install) the fixed version
+cd ..
+//jump to parent directory
+make
+
+output:
+make  all-recursive
+make[1]: Entering directory `/w/home.20/class/classxiw/coreutils-7.6'
+Making all in lib
+make[2]: Entering directory `/w/home.20/class/classxiw/coreutils-7.6/lib'
+make  all-recursive
+make[3]: Entering directory `/w/home.20/class/classxiw/coreutils-7.6/lib'
+make[4]: Entering directory `/w/home.20/class/classxiw/coreutils-7.6/lib'
+make[4]: Leaving directory `/w/home.20/class/classxiw/coreutils-7.6/lib'
+make[3]: Leaving directory `/w/home.20/class/classxiw/coreutils-7.6/lib'
+make[2]: Leaving directory `/w/home.20/class/classxiw/coreutils-7.6/lib'
+Making all in src
+make[2]: Entering directory `/w/home.20/class/classxiw/coreutils-7.6/src'
+make  all-am
+make[3]: Entering directory `/w/home.20/class/classxiw/coreutils-7.6/src'
+  CC     ls.o
+  CCLD   dir
+  CCLD   vdir
+  CCLD   ls
+make[3]: Leaving directory `/w/home.20/class/classxiw/coreutils-7.6/src'
+make[2]: Leaving directory `/w/home.20/class/classxiw/coreutils-7.6/src'
+Making all in doc
+make[2]: Entering directory `/w/home.20/class/classxiw/coreutils-7.6/doc'
+make[2]: Nothing to be done for `all'.
+make[2]: Leaving directory `/w/home.20/class/classxiw/coreutils-7.6/doc'
+Making all in man
+make[2]: Entering directory `/w/home.20/class/classxiw/coreutils-7.6/man'
+  GEN    dir.1
+  GEN    vdir.1
+  GEN    ls.1
+make[2]: Leaving directory `/w/home.20/class/classxiw/coreutils-7.6/man'
+Making all in po
+make[2]: Entering directory `/w/home.20/class/classxiw/coreutils-7.6/po'
+make[2]: Nothing to be done for `all'.
+make[2]: Leaving directory `/w/home.20/class/classxiw/coreutils-7.6/po'
+Making all in tests
+make[2]: Entering directory `/w/home.20/class/classxiw/coreutils-7.6/tests'
+make[2]: Nothing to be done for `all'.
+make[2]: Leaving directory `/w/home.20/class/classxiw/coreutils-7.6/tests'
+Making all in gnulib-tests
+make[2]: Entering directory `/w/home.20/class/classxiw/coreutils-7.6
+/gnulib-tests'
+make  all-recursive
+make[3]: Entering directory `/w/home.20/class/classxiw/coreutils-7.6
+/gnulib-tests'
+make[4]: Entering directory `/w/home.20/class/classxiw/coreutils-7.6
+/gnulib-tests'
+make[4]: Nothing to be done for `all-am'.
+make[4]: Leaving directory `/w/home.20/class/classxiw/coreutils-7.6
+/gnulib-tests'
+make[3]: Leaving directory `/w/home.20/class/classxiw/coreutils-7.6
+/gnulib-tests'
+make[2]: Leaving directory `/w/home.20/class/classxiw/coreutils-7.6
+/gnulib-tests'
+make[2]: Entering directory `/w/home.20/class/classxiw/coreutils-7.6'
+make[2]: Nothing to be done for `all-am'.
+make[2]: Leaving directory `/w/home.20/class/classxiw/coreutils-7.6'
+make[1]: Leaving directory `/w/home.20/class/classxiw/coreutils-7.6'
+
+Most of the lines are not needed and nothing changed. 
+Only the file ls.c is changed,
+so files ls.o, dir, vdir, ls, di.1, vdir.1 ls.1 are regenerated.
+(Lines with CC CCLD GEN)
+
+6. testing that the modified ls
+jump to a directory with recently modified file.
+cd /u/eng/class/classxiw/Desktop
+i. Test modified ls on recently modified file lab2.tar.gz
+/u/eng/class/classxiw/coreutils-7.6/src/ls -l lab2.tar.gz
+output: -rw-r--r-- 1 classxiw class 1490042 Oct 12 02:01 lab2.tar.gz
+//it's been modified!
+
+ii. Test installed ls with recently modified file
+/u/eng/class/classxiw/Desktop/coreutils/bin/ls -l lab2.tar.gz
+output: -rw-r--r-- 1 classxiw class 1490042 2017-10-12 02:01 lab2.tar.gz
+//bug exists
+
+touch a file to mark it as being a year old:
+man touch //First read man page to know how to use it 
+touch -t 201501010101 datalab.zip
+
+i.  Test modified ls on file more than one year old datalab.zip
+/u/eng/class/classxiw/coreutils-7.6/src/ls -l datalab.zip
+output: -rw-r--r-- 1 classxiw class 311933 Jan  1  2015 datalab.zip
+//modified version；
+Compared with recent modified file, the format changed: 
+year is included but exact time is not shown
+
+ii. Test installed ls with file more than one year old
+/u/eng/class/classxiw/Desktop/coreutils/bin/ls -l datalab.zip
+output: -rw-r--r-- 1 classxiw class 311933 2015-01-01 01:01 datalab.zip
+//with bug
+But same format with recently modified files

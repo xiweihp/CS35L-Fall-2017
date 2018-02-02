@@ -1,0 +1,63 @@
+Q1:
+Original code:
+case long_iso_time_style:
+case_long_iso_time_style:
+    long_time_format[0] = long_time_format[1] = "%Y-%m-%d %H:%M";
+    break;
+
+The line "case_long_iso_time_style:" is not a new case
+because of the '_' after 'case'.
+But it is just a label that never been referenced;
+Nothing would change.
+So it can be deleted but not necessary.
+
+Q2:
+In the patch, the modified format is like:
+long_time_format[i] = dcgettext (NULL, long_time_format[i], LC_TIME);
+It uses dcgettext function,
+and the function cannot translate all languages. 
+So there may be some countries where users don't speak English,
+and problems would occur.
+
+Moreover, it might cause inconsistencies with other program of that version:
+the format is different from others' without the patch.
+
+Q3:
+The output when working on /dev/null was like:
+Traceback (most recent call last):
+  File "./randline.py", line 70, in <module>
+    main()
+  File "./randline.py", line 64, in main
+    sys.stdout.write(generator.chooseline())
+  File "./randline.py", line 34, in chooseline
+    return random.choice(self.lines)
+  File "/usr/lib64/python2.7/random.py", line 274, in choice
+    return seq[int(self.random() * len(seq))]  
+    # raises IndexError if seq is empty
+IndexError: list index out of range  
+
+output IndexError when applying to empty file. 
+We can see from the error message that the error happened when 
+randline.py call chooseline() function that 
+lead to random.choice() from random library.
+
+Examine the randline.py code, found that,
+if numlines < 0:
+    parser.error("negative count: {0}".format(numlines))
+
+This does not include when numlines == 0.
+So when the file is empty, it still choose a line,
+which is an undefined behavior.
+
+Q4:
+Run under python3 and output is:
+  File "randline.py", line 65
+    except IOError as (errno, strerror):
+                      ^
+SyntaxError: invalid syntax
+
+The syntax of the python3 is different from python 2. 
+Searched for python 3 documention about the error line,
+there's no IOError as this.
+
+
